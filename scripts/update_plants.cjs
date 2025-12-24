@@ -4,7 +4,7 @@ const path = require('path');
 const IMAGES_DIR = path.join(__dirname, '../public/images');
 const DATA_FILE = path.join(__dirname, '../src/data/plants.json');
 
-// Romaji to Katakana map (simplified)
+// Romaji to Katakana map (comprehensive)
 const romajiMap = {
     'a': 'ア', 'i': 'イ', 'u': 'ウ', 'e': 'エ', 'o': 'オ',
     'ka': 'カ', 'ki': 'キ', 'ku': 'ク', 'ke': 'ケ', 'ko': 'コ',
@@ -18,7 +18,7 @@ const romajiMap = {
     'wa': 'ワ', 'wo': 'ヲ', 'nn': 'ン', 'n': 'ン',
     'ga': 'ガ', 'gi': 'ギ', 'gu': 'グ', 'ge': 'ゲ', 'go': 'ゴ',
     'za': 'ザ', 'ji': 'ジ', 'zi': 'ジ', 'zu': 'ズ', 'ze': 'ゼ', 'zo': 'ゾ',
-    'da': 'ダ', 'di': 'ヂ', 'ji': 'ヂ', 'du': 'ヅ', 'zu': 'ヅ', 'de': 'デ', 'do': 'ド',
+    'da': 'ダ', 'di': 'ヂ', 'du': 'ヅ', 'de': 'デ', 'do': 'ド',
     'ba': 'バ', 'bi': 'ビ', 'bu': 'ブ', 'be': 'ベ', 'bo': 'ボ',
     'pa': 'パ', 'pi': 'ピ', 'pu': 'プ', 'pe': 'ペ', 'po': 'ポ',
     'kya': 'キャ', 'kyu': 'キュ', 'kyo': 'キョ',
@@ -33,50 +33,53 @@ const romajiMap = {
     'zya': 'ジャ', 'zyu': 'ジュ', 'zyo': 'ジョ',
     'bya': 'ビャ', 'byu': 'ビュ', 'byo': 'ビョ',
     'pya': 'ピャ', 'pyu': 'ピュ', 'pyo': 'ピョ',
+    'la': 'ラ', 'li': 'リ', 'lu': 'ル', 'le': 'レ', 'lo': 'ロ',
+    'ra': 'ラ', 'ri': 'リ', 'ru': 'ル', 're': 'レ', 'ro': 'ロ',
     '-': 'ー'
 };
 
 function toKatakana(romaji) {
     let result = '';
-    let str = romaji.toLowerCase();
+    let str = romaji.toLowerCase()
+        .replace(/[0-9]/g, '') // Remove numbers
+        .replace(/_/g, '');    // Remove underscores
 
-    // Manual overrides for tricky combos not in map or double consonants
-    // Simple parser
     let i = 0;
     while (i < str.length) {
-        // Check 3 chars
+        // Check 3 chars (e.g., tsu)
         if (i + 3 <= str.length) {
             const sub = str.substring(i, i + 3);
             if (romajiMap[sub]) {
                 result += romajiMap[sub];
-                i += 3;
-                continue;
+                i += 3; continue;
             }
         }
-        // Check 2 chars
+        // Check 2 chars (e.g., ka, sha)
         if (i + 2 <= str.length) {
             const sub = str.substring(i, i + 2);
             if (romajiMap[sub]) {
                 result += romajiMap[sub];
-                i += 2;
-                continue;
+                i += 2; continue;
             }
-            // Double consonants (kk, tt, etc) -> small tsu
             if (sub[0] === sub[1] && sub[0] !== 'n') {
                 result += 'ッ';
-                i++;
-                continue;
+                i++; continue;
             }
         }
         // Check 1 char
         const sub = str[i];
         if (romajiMap[sub]) {
             result += romajiMap[sub];
-            i++;
-            continue;
+            i++; continue;
         }
-        // Fallback
-        result += sub;
+
+        // Single consonant handling (fallback for trailing c, s, etc.)
+        const mappings = { 'c': 'ク', 'k': 'ク', 's': 'ス', 't': 'ト', 'm': 'ム', 'r': 'ル', 'l': 'ル', 'g': 'グ', 'f': 'フ', 'p': 'プ', 'b': 'ブ', 'd': 'ド' };
+        if (mappings[sub]) {
+            result += mappings[sub];
+        } else {
+            result += sub;
+        }
         i++;
     }
     return result;

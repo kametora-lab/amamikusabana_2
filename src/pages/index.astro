@@ -18,11 +18,19 @@ const featuredPlants = plants.slice(0, 9);
 				Digital Botanical Database <span class="text-neon-cyan">///</span> ver.2025
 			</p>
 			
-			<div class="flex gap-4 justify-center pt-8">
+			<div class="flex flex-wrap gap-4 justify-center pt-8">
 				<a href="/plants">
 					<NeonButton client:load variant="primary">Explore Database</NeonButton>
 				</a>
-				<NeonButton client:load variant="secondary">View Categories</NeonButton>
+				<button 
+					onClick={() => {
+						const randomPlant = plants[Math.floor(Math.random() * plants.length)];
+						window.location.href = `/plants/${randomPlant.slug}`;
+					}}
+					class="neon-button-secondary"
+				>
+					<NeonButton client:load variant="secondary">Random Discovery</NeonButton>
+				</button>
 			</div>
 		</section>
 
